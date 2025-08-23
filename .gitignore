@@ -50,3 +50,18 @@ bin/
 .claude/
 CLAUDE.md
 claude.config.json
+
+# Node.js dependencies and files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build outputs from CSS compilation
+*.css.map
+
+# Air live reload
+tmp/
+build-errors.log
