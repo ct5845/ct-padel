@@ -1,8 +1,8 @@
-package page
+package templates
 
 import (
-	_ "ct-go-web-starter/src/config"
-	"ct-go-web-starter/src/utils"
+	_ "ct-go-web-starter/src/infrastructure/config"
+	"ct-go-web-starter/src/shared/utils"
 	_ "embed"
 	"html/template"
 	"log/slog"

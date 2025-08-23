@@ -1,16 +1,17 @@
-package pages
+package home
 
 import (
-	"ct-go-web-starter/src/organisms/footer"
-	"ct-go-web-starter/src/organisms/header"
-	"ct-go-web-starter/src/templates/page"
+	"ct-go-web-starter/src/shared/components/footer"
+	"ct-go-web-starter/src/shared/components/header"
+	"ct-go-web-starter/src/shared/templates"
+	"ct-go-web-starter/src/shared/utils"
 	"html/template"
 	"io"
 	"log/slog"
 	"net/http"
 )
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
+func Handler(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("Rendering index page", "pages", "index", "path", r.URL.Path)
 	if r.URL.Path != "/" {
 		slog.Warn("Path not found", "path", r.URL.Path)
@@ -18,7 +19,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header, err := header.Render(header.Data{Title: "CT Padel"})
+	header, err := header.Render(header.Data{Title: "CT Go Web Starter"})
 
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -32,12 +33,16 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content := template.HTML("content")
+	content, err := utils.LoadComponent("features/home/home.html")
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-	page, err := page.Render(page.Data{
-		Title:       "CT Padel",
+	page, err := templates.Render(templates.Data{
+		Title:       "CT Go Web Starter",
 		HeaderHTML:  header,
-		ContentHTML: content,
+		ContentHTML: template.HTML(content),
 		FooterHTML:  footer,
 	})
 

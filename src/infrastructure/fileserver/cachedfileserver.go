@@ -28,7 +28,9 @@ type responseWriterWrapper struct {
 func (rw *responseWriterWrapper) WriteHeader(statusCode int) {
 	if !rw.headerSet && rw.hasETag {
 		rw.Header().Set("ETag", rw.etag)
-		rw.Header().Set("Cache-Control", "public, max-age=31536000") // 1 year
+		// Use no-cache with ETag to force revalidation
+		// Browser will check ETag on every request, enabling cache busting
+		rw.Header().Set("Cache-Control", "public, no-cache, must-revalidate")
 		rw.headerSet = true
 	}
 	rw.ResponseWriter.WriteHeader(statusCode)

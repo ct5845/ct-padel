@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ct-go-web-starter/src/utils"
+	"ct-go-web-starter/src/shared/utils"
 	"log/slog"
 	"os"
 )

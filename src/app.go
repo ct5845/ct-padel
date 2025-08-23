@@ -1,8 +1,8 @@
 package src
 
 import (
-	"ct-go-web-starter/src/fileserver"
-	"ct-go-web-starter/src/pages"
+	"ct-go-web-starter/src/features/home"
+	"ct-go-web-starter/src/infrastructure/fileserver"
 	"log"
 	"log/slog"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 func App() {
 	// Routes
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", pages.IndexHandler)
+	mux.HandleFunc("/", home.Handler)
 
 	// Handle Chrome DevTools well-known endpoint to keep logs clean
 	mux.HandleFunc("/.well-known/appspecific/com.chrome.devtools.json", func(w http.ResponseWriter, r *http.Request) {
