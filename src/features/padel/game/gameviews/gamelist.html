@@ -1,0 +1,17 @@
+<ul class="flex flex-col gap-2">
+    {{ if .Games }} {{ range .Games }}
+    <li>
+        <a class="button-secondary" href="/matches/{{$.Match.ID}}/sets/{{$.Set.ID}}/games/{{.ID}}"
+            >Game {{.GameNumber}} (ID: {{.ID}})</a
+        >
+    </li>
+    {{ end }}
+    <li>
+        <a hx-post="/matches/{{.Match.ID}}/sets/{{.Set.ID}}/games" class="button-primary cta">Add new game!</a>
+    </li>
+    {{ else }}
+    <li>
+        <a hx-post="/matches/{{.Match.ID}}/sets/{{.Set.ID}}/games" class="button-primary cta">Create your first game!</a>
+    </li>
+    {{ end }}
+</ul>

@@ -1,0 +1,100 @@
+<section class="flex flex-col gap-4">
+    <form
+        hx-patch="/matches/{{.Match.ID}}/sets/{{.Set.ID}}/games/{{.Game.ID}}/points/{{.Point.ID}}/plays/{{.Play.ID}}"
+        class="p-4 flex flex-col gap-4 rounded-md border border-outline"
+    >
+        <div class="form-field">
+            <label for="player">Player</label>
+            <select id="player" required name="player_id">
+                <option value="{{ .Match.Team1Player1.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team1Player1.ID)}}selected{{end}}>
+                    {{ .Match.Team1Player1.Name }}
+                </option>
+                <option value="{{ .Match.Team1Player2.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team1Player2.ID)}}selected{{end}}>
+                    {{ .Match.Team1Player2.Name }}
+                </option>
+                <option value="{{ .Match.Team2Player1.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team2Player1.ID)}}selected{{end}}>
+                    {{ .Match.Team2Player1.Name }}
+                </option>
+                <option value="{{ .Match.Team2Player2.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team2Player2.ID)}}selected{{end}}>
+                    {{ .Match.Team2Player2.Name }}
+                </option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="ball_position_x">Ball Position X</label>
+            <input
+                type="number"
+                min="0"
+                max="6"
+                id="ball_position_x"
+                required
+                name="ball_position_x"
+                value="{{ .Play.BallPositionX }}"
+            />
+        </div>
+
+        <div class="form-field">
+            <label for="ball_position_y">Ball Position Y</label>
+            <input
+                type="number"
+                min="0"
+                max="11"
+                id="ball_position_y"
+                required
+                name="ball_position_y"
+                value="{{ .Play.BallPositionY }}"
+            />
+        </div>
+
+        <div class="form-field">
+            <label for="result_type">Result</label>
+            <select required id="result_type" name="result_type">
+                <option {{if not .Play.ResultType.Valid}}selected{{end}}>Return</option>
+                <option value="no_return_winner" {{if and .Play.ResultType.Valid (eq .Play.ResultType.String "no_return_winner")}}selected{{end}}>Winner</option>
+                <option value="error" {{if and .Play.ResultType.Valid (eq .Play.ResultType.String "error")}}selected{{end}}>Error</option>
+                <option value="unforced_error" {{if and .Play.ResultType.Valid (eq .Play.ResultType.String "unforced_error")}}selected{{end}}>Unforced Error</option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="hand_side">Forehand/Backhand</label>
+            <select required id="hand_side" name="hand_side">
+                <option value="forehand" {{if and .Play.HandSide.Valid (eq .Play.HandSide.String "forehand")}}selected{{end}}>Forehand</option>
+                <option value="backhand" {{if and .Play.HandSide.Valid (eq .Play.HandSide.String "backhand")}}selected{{end}}>Backhand</option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="contact_type">Contact Type</label>
+            <select required id="contact_type" name="contact_type">
+                <option value="serve" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "serve")}}selected{{end}}>Serve</option>
+                <option value="groundstroke" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "groundstroke")}}selected{{end}}>Groundstroke</option>
+                <option value="volley" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "volley")}}selected{{end}}>Volley</option>
+                <option value="overhead" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "overhead")}}selected{{end}}>Overhead</option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="shot_effect">Shot Effect</label>
+            <select required id="shot_effect" name="shot_effect">
+                <option value="flat" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "flat")}}selected{{end}}>Flat</option>
+                <option value="up" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "up")}}selected{{end}}>Up</option>
+                <option value="down" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "down")}}selected{{end}}>Down</option>
+                <option value="drop" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "drop")}}selected{{end}}>Drop</option>
+                <option value="smash" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "smash")}}selected{{end}}>Smash</option>
+            </select>
+        </div>
+
+        <button type="submit" class="button-primary cta">Save Play</button>
+    </form>
+
+    <div class="p-4 rounded-md border border-error">
+        <h2 class="text-error">Danger Zone</h2>
+        <button
+            hx-delete="/matches/{{.Match.ID}}/sets/{{.Set.ID}}/games/{{.Game.ID}}/points/{{.Point.ID}}/plays/{{.Play.ID}}"
+            class="button-error"
+        >
+            Delete Play
+        </button>
+    </div>
+</section>

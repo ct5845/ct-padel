@@ -1,8 +1,7 @@
 package templates
 
 import (
-	_ "ct-go-web-starter/src/infrastructure/config"
-	"ct-go-web-starter/src/shared/utils"
+	"ct-padel-s/src/shared/utils"
 	_ "embed"
 	"html/template"
 	"log/slog"

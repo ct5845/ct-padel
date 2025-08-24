@@ -1,0 +1,13 @@
+<section class="flex flex-col gap-4">
+    <div class="p-4 rounded-md border border-outline">
+        <h2>Points</h2>
+        {{.PointsListHTML}}
+    </div>
+
+    <div class="p-4 rounded-md border border-error">
+        <h2 class="text-error">Danger Zone</h2>
+        <button hx-delete="/matches/{{.Match.ID}}/sets/{{.Set.ID}}/games/{{.Game.ID}}" class="button-error">
+            Delete Game
+        </button>
+    </div>
+</section>

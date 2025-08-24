@@ -1,0 +1,17 @@
+<ul class="flex flex-col gap-2">
+    {{ if .Sets }} {{ range .Sets }}
+    <li>
+        <a class="button-secondary" href="/matches/{{.MatchID}}/sets/{{.ID}}"
+            >Set {{.SetNumber}} (ID: {{.ID}})</a
+        >
+    </li>
+    {{ end }}
+    <li>
+        <a hx-post="/matches/{{.MatchID}}/sets" class="button-primary cta">Add new set!</a>
+    </li>
+    {{ else }}
+    <li>
+        <a hx-post="/matches/{{.MatchID}}/sets" class="button-primary cta">Create your first set!</a>
+    </li>
+    {{ end }}
+</ul>

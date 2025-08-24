@@ -1,6 +1,8 @@
-<header class="p-2">
-  <h1>{{.Title}}</h1>
-  <nav>
-    <a href="/">Home</a>
-  </nav>
+<header class="p-4 flex flex-col gap-4">
+    {{ if .Breadcrumb }} {{ .Breadcrumb }} {{ else }}
+    <nav class="flex gap-4">
+        <a class="button-primary" href="/">Home</a>
+        <a class="button-primary" href="/matches">Matches</a>
+    </nav>
+    {{ end }}
 </header>

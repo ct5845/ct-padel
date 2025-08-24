@@ -1,0 +1,5 @@
+@layer components {
+  .form-field {
+    @apply flex flex-col gap-4 bg-surface-container-low rounded-md p-4;
+  }
+}

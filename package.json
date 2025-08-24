@@ -1,11 +1,12 @@
 {
-  "name": "ct-web-starter",
+  "name": "ct-padel",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "build-css": "tailwindcss -i ./src/styles/styles.css -o ./build/static/style.css --minify",
     "dev": "air",
-    "build": "go generate . && go build -o ./build/main.exe ."
+    "build": "go generate . && go build -o ./build/main.exe .",
+    "db-reset": "docker-compose down -v && docker-compose up -d"
   },
   "keywords": [],
   "author": "",

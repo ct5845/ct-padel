@@ -1,7 +1,8 @@
 package main
 
 import (
-	"ct-go-web-starter/src/shared/utils"
+	_ "ct-padel-s/src/infrastructure/logging" // Import for colored logging init
+	"ct-padel-s/src/shared/utils"
 	"log/slog"
 	"os"
 )

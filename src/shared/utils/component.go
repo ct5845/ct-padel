@@ -2,11 +2,8 @@ package utils
 
 import (
 	"bytes"
-	_ "ct-go-web-starter/src/infrastructure/config"
 	"html/template"
 	"log/slog"
-	"os"
-	"path/filepath"
 )
 
 // component represents a reusable template component
@@ -51,19 +48,4 @@ func (c *component) MustRender(data interface{}) template.HTML {
 		slog.Error("Component render failed, panicking", "name", c.name, "error", err)
 	}
 	return html
-}
-
-// LoadComponent loads an HTML file from the src directory
-func LoadComponent(relativeFilePath string) (string, error) {
-	fullPath := filepath.Join("src", relativeFilePath)
-	slog.Debug("Loading component file", "path", fullPath)
-	
-	content, err := os.ReadFile(fullPath)
-	if err != nil {
-		slog.Error("Failed to read component file", "path", fullPath, "error", err)
-		return "", err
-	}
-	
-	slog.Debug("Component file loaded successfully", "path", fullPath)
-	return string(content), nil
 }

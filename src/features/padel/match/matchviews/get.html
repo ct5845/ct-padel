@@ -1,0 +1,32 @@
+<section class="flex flex-col gap-4">
+    <div class="p-4 rounded-md border border-outline">
+        <h2>Teams</h2>
+        <div>
+            <h3>Team 1</h3>
+            <ul class="flex items-center gap-4">
+                <li class="rounded-3xl px-4 py-2 bg-primary-container">{{.Match.Team1Player1.Name}}</li>
+                <li class="rounded-3xl px-4 py-2 bg-primary-container">{{.Match.Team1Player2.Name}}</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>Team 2</h3>
+            <ul class="flex items-center gap-4">
+                <li class="rounded-3xl px-4 py-2 bg-tertiary-container">{{.Match.Team2Player1.Name}}</li>
+                <li class="rounded-3xl px-4 py-2 bg-tertiary-container">{{.Match.Team2Player2.Name}}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="p-4 rounded-md border border-outline">
+        <h2>Sets</h2>
+        {{ .SetsList }}
+    </div>
+
+    <div class="p-4 rounded-md border border-error-container">
+        <h2 class="text-error">Danger Zone</h2>
+        <button hx-delete="/matches/{{.Match.ID}}" class="button-error">
+            Delete Match
+        </button>
+    </div>
+</section>

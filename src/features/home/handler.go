@@ -1,15 +1,20 @@
 package home
 
 import (
-	"ct-go-web-starter/src/shared/components/footer"
-	"ct-go-web-starter/src/shared/components/header"
-	"ct-go-web-starter/src/shared/templates"
-	"ct-go-web-starter/src/shared/utils"
+	"ct-padel-s/src/shared/components/footer"
+	"ct-padel-s/src/shared/components/header"
+	"ct-padel-s/src/shared/templates"
+	"ct-padel-s/src/shared/utils"
+	_ "embed"
 	"html/template"
 	"io"
 	"log/slog"
 	"net/http"
 )
+
+//go:embed home.html
+var homeHTML string
+var homeComponent = utils.NewComponent("home.html", homeHTML)
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("Rendering index page", "pages", "index", "path", r.URL.Path)
@@ -19,7 +24,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header, err := header.Render(header.Data{Title: "CT Go Web Starter"})
+	header, err := header.Render(header.Data{Title: "CT Padel Tracker"})
 
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -33,7 +38,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content, err := utils.LoadComponent("features/home/home.html")
+	content, err := homeComponent.Render(nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

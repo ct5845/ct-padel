@@ -24,7 +24,7 @@ A modern Go web application starter template with HTMX, Alpine.js, and TailwindC
 1. Clone the repository:
    ```bash
    git clone <your-repo-url>
-   cd ct-go-web-starter
+   cd ct-padel-s
    ```
 
 2. Install dependencies:

@@ -1,0 +1,40 @@
+@utility button {
+  @apply flex items-center px-4 py-2 gap-4;
+  @apply cursor-pointer shrink-0 rounded-sm;
+  @apply font-semibold;
+  @apply border ring-2 hover:ring-4 focus:ring-4;
+}
+
+@layer components {
+  .button-primary {
+    @apply button;
+    @apply border-primary text-primary ring-primary-container;
+  }
+
+  .button-primary.cta {
+    @apply bg-primary text-on-primary;
+  }
+
+  .button-secondary {
+    @apply button;
+    @apply border-secondary text-secondary ring-secondary-container;
+  }
+
+  .button-secondary.cta {
+    @apply bg-secondary text-on-secondary;
+  }
+
+  .button-tertiary {
+    @apply button;
+    @apply border-tertiary text-tertiary ring-tertiary-container;
+  }
+
+  .button-tertiary.cta {
+    @apply bg-tertiary text-on-tertiary;
+  }
+
+  .button-error {
+    @apply button;
+    @apply border-error text-error ring-error-container;
+  }
+}

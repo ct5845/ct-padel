@@ -1,8 +1,7 @@
 package header
 
 import (
-	_ "ct-go-web-starter/src/infrastructure/config"
-	"ct-go-web-starter/src/shared/utils"
+	"ct-padel-s/src/shared/utils"
 	_ "embed"
 	"html/template"
 	"log/slog"
@@ -13,7 +12,8 @@ var headerHTML string
 var component = utils.NewComponent("header.html", headerHTML)
 
 type Data struct {
-	Title string
+	Title      string
+	Breadcrumb template.HTML
 }
 
 func init() {
