@@ -107,7 +107,7 @@ func (h *ColorHandler) WithGroup(name string) slog.Handler {
 func init() {
 	// Configure slog with colored output and source location information
 	opts := &slog.HandlerOptions{
-		Level:     slog.LevelInfo,
+		Level:     slog.LevelDebug,
 		AddSource: true,
 	}
 	handler := NewColorHandler(os.Stdout, opts)

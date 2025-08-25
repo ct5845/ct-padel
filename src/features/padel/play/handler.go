@@ -353,6 +353,96 @@ func GetByPoint(w http.ResponseWriter, r *http.Request) {
 	slog.Info("Handled", "method", r.Method, "path", r.URL.Path)
 }
 
+func Patch(w http.ResponseWriter, r *http.Request) {
+	slog.Debug("Handling", "method", r.Method, "path", r.URL.Path)
+	db := database.GetDB()
+
+	playID := playshared.GetPlayID(w, r)
+	if playID == 0 {
+		slog.Error("Invalid play ID", "playID", playID)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Get existing play
+	existingPlay, err := playrepo.GetPlay(db, playID)
+	if err != nil {
+		slog.Error("Failed to get play", "error", err, "playID", playID)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if existingPlay == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// Parse form data
+	if err := r.ParseForm(); err != nil {
+		slog.Error("Failed to parse form", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+
+	// Update the play with form values
+	updatedPlay := *existingPlay
+
+	// Parse player ID (optional)
+	if playerIDStr := r.FormValue("player_id"); playerIDStr != "" {
+		if playerID, err := strconv.ParseInt(playerIDStr, 10, 64); err == nil {
+			updatedPlay.PlayerID = sql.NullInt64{Int64: playerID, Valid: true}
+		}
+	}
+
+	// Parse ball positions (optional, use existing values as fallback)
+	if ballXStr := r.FormValue("ball_position_x"); ballXStr != "" {
+		if ballX, err := strconv.Atoi(ballXStr); err == nil && ballX >= 0 && ballX <= 10000 {
+			updatedPlay.BallPositionX = ballX
+		}
+	}
+	if ballYStr := r.FormValue("ball_position_y"); ballYStr != "" {
+		if ballY, err := strconv.Atoi(ballYStr); err == nil && ballY >= 0 && ballY <= 20000 {
+			updatedPlay.BallPositionY = ballY
+		}
+	}
+
+	// Handle optional fields
+	if resultType := r.FormValue("result_type"); resultType != "" {
+		updatedPlay.ResultType = sql.NullString{String: resultType, Valid: true}
+	} else {
+		updatedPlay.ResultType = sql.NullString{Valid: false}
+	}
+
+	if handSide := r.FormValue("hand_side"); handSide != "" {
+		updatedPlay.HandSide = sql.NullString{String: handSide, Valid: true}
+	} else {
+		updatedPlay.HandSide = sql.NullString{Valid: false}
+	}
+
+	if contactType := r.FormValue("contact_type"); contactType != "" {
+		updatedPlay.ContactType = sql.NullString{String: contactType, Valid: true}
+	} else {
+		updatedPlay.ContactType = sql.NullString{Valid: false}
+	}
+
+	if shotEffect := r.FormValue("shot_effect"); shotEffect != "" {
+		updatedPlay.ShotEffect = sql.NullString{String: shotEffect, Valid: true}
+	} else {
+		updatedPlay.ShotEffect = sql.NullString{Valid: false}
+	}
+
+	// Save to database
+	if err := playrepo.UpdatePlay(db, &updatedPlay); err != nil {
+		slog.Error("Failed to update play", "error", err, "playID", playID)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	slog.Info("Handled", "method", r.Method, "path", r.URL.Path)
+	w.WriteHeader(http.StatusOK)
+}
+
 func Update(w http.ResponseWriter, r *http.Request) {
 	slog.Debug("Handling", "method", r.Method, "path", r.URL.Path)
 	db := database.GetDB()
@@ -429,13 +519,13 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	ballXStr := r.FormValue("ball_position_x")
 	ballYStr := r.FormValue("ball_position_y")
 	ballX, err := strconv.Atoi(ballXStr)
-	if err != nil || ballX < 0 || ballX > 6 {
+	if err != nil || ballX < 0 || ballX > 10000 {
 		slog.Error("Invalid ball position X", "error", err, "ballX", ballXStr)
 		http.Error(w, "Invalid ball position X", http.StatusBadRequest)
 		return
 	}
 	ballY, err := strconv.Atoi(ballYStr)
-	if err != nil || ballY < 0 || ballY > 11 {
+	if err != nil || ballY < 0 || ballY > 20000 {
 		slog.Error("Invalid ball position Y", "error", err, "ballY", ballYStr)
 		http.Error(w, "Invalid ball position Y", http.StatusBadRequest)
 		return
@@ -452,25 +542,25 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	updatedPlay.PlayerID = sql.NullInt64{Int64: playerID, Valid: true}
 	updatedPlay.BallPositionX = ballX
 	updatedPlay.BallPositionY = ballY
-	
+
 	if resultType != "" && resultType != "Return" {
 		updatedPlay.ResultType = sql.NullString{String: resultType, Valid: true}
 	} else {
 		updatedPlay.ResultType = sql.NullString{Valid: false}
 	}
-	
+
 	if handSide != "" {
 		updatedPlay.HandSide = sql.NullString{String: handSide, Valid: true}
 	} else {
 		updatedPlay.HandSide = sql.NullString{Valid: false}
 	}
-	
+
 	if contactType != "" {
 		updatedPlay.ContactType = sql.NullString{String: contactType, Valid: true}
 	} else {
 		updatedPlay.ContactType = sql.NullString{Valid: false}
 	}
-	
+
 	if shotEffect != "" {
 		updatedPlay.ShotEffect = sql.NullString{String: shotEffect, Valid: true}
 	} else {
@@ -490,12 +580,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 
 	// Handle the case where point was previously ended but now continues
 	if pointWasEnded && !pointEnded {
-		slog.Warn("Point was previously ended but now continues", "pointID", pointID, "playID", playID, 
+		slog.Warn("Point was previously ended but now continues", "pointID", pointID, "playID", playID,
 			"previousResult", existingPlay.ResultType.String)
 		// Note: This could potentially affect subsequent points that were auto-created
 		// For now, we allow this but log a warning. Future enhancement: validate consistency
 	}
-	
+
 	if pointEnded {
 		// Delete any subsequent plays in this point
 		if err := playrepo.DeleteSubsequentPlays(db, pointID, updatedPlay.PlayNumber); err != nil {

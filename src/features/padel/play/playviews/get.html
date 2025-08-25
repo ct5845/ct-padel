@@ -1,91 +1,219 @@
-<section class="flex flex-col gap-4">
-    <form
-        hx-patch="/matches/{{.Match.ID}}/sets/{{.Set.ID}}/games/{{.Game.ID}}/points/{{.Point.ID}}/plays/{{.Play.ID}}"
-        class="p-4 flex flex-col gap-4 rounded-md border border-outline"
-    >
-        <div class="form-field">
-            <label for="player">Player</label>
-            <select id="player" required name="player_id">
-                <option value="{{ .Match.Team1Player1.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team1Player1.ID)}}selected{{end}}>
-                    {{ .Match.Team1Player1.Name }}
-                </option>
-                <option value="{{ .Match.Team1Player2.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team1Player2.ID)}}selected{{end}}>
-                    {{ .Match.Team1Player2.Name }}
-                </option>
-                <option value="{{ .Match.Team2Player1.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team2Player1.ID)}}selected{{end}}>
-                    {{ .Match.Team2Player1.Name }}
-                </option>
-                <option value="{{ .Match.Team2Player2.ID }}" {{if and .Play.PlayerID.Valid (eq .Play.PlayerID.Int64 .Match.Team2Player2.ID)}}selected{{end}}>
-                    {{ .Match.Team2Player2.Name }}
-                </option>
-            </select>
-        </div>
-        <div class="form-field">
-            <label for="ball_position_x">Ball Position X</label>
-            <input
-                type="number"
-                min="0"
-                max="6"
-                id="ball_position_x"
-                required
-                name="ball_position_x"
-                value="{{ .Play.BallPositionX }}"
-            />
-        </div>
+<section
+    class="flex flex-col gap-4"
+    x-data="playForm({
+        playerID: {{if .Play.PlayerID.Valid}}{{.Play.PlayerID.Int64}}{{else}}''{{end}},
+        ballPositionX: {{.Play.BallPositionX}},
+        ballPositionY: {{.Play.BallPositionY}},
+        resultType: '{{if .Play.ResultType.Valid}}{{.Play.ResultType.String}}{{else}}{{end}}',
+        handSide: '{{if .Play.HandSide.Valid}}{{.Play.HandSide.String}}{{else}}{{end}}',
+        contactType: '{{if .Play.ContactType.Valid}}{{.Play.ContactType.String}}{{else}}{{end}}',
+        shotEffect: '{{if .Play.ShotEffect.Valid}}{{.Play.ShotEffect.String}}{{else}}{{end}}'
+    })"
+>
+    <form class="grid grid-cols-4 gap-4"
+          hx-patch="/matches/{{.Match.ID}}/sets/{{.Set.ID}}/games/{{.Game.ID}}/points/{{.Point.ID}}/plays/{{.Play.ID}}"
+          hx-trigger="change from:input"
+          hx-include="*"
+          hx-indicator="#saving-indicator"
+          hx-swap="none">
+        <section class="flex items-center justify-center col-span-1">
+            <svg
+                class="max-h-[75vh]"
+                viewBox="0 0 10000 20000"
+                @mousemove="drag($event)"
+                @mouseup="endDrag()"
+                @mouseleave="endDrag()"
+            >
+                <rect
+                    x="0"
+                    y="0"
+                    width="10000"
+                    height="20000"
+                    class="fill-blue-600 stroke-[200px] stroke-blue-900"
+                ></rect>
 
-        <div class="form-field">
-            <label for="ball_position_y">Ball Position Y</label>
-            <input
-                type="number"
-                min="0"
-                max="11"
-                id="ball_position_y"
-                required
-                name="ball_position_y"
-                value="{{ .Play.BallPositionY }}"
-            />
-        </div>
+                <line x1="0" y1="3000" x2="10000" y2="3000" class="stroke-slate-200 stroke-[100px]" />
+                <line x1="0" y1="17000" x2="10000" y2="17000" class="stroke-slate-200 stroke-[100px]" />
 
-        <div class="form-field">
-            <label for="result_type">Result</label>
-            <select required id="result_type" name="result_type">
-                <option {{if not .Play.ResultType.Valid}}selected{{end}}>Return</option>
-                <option value="no_return_winner" {{if and .Play.ResultType.Valid (eq .Play.ResultType.String "no_return_winner")}}selected{{end}}>Winner</option>
-                <option value="error" {{if and .Play.ResultType.Valid (eq .Play.ResultType.String "error")}}selected{{end}}>Error</option>
-                <option value="unforced_error" {{if and .Play.ResultType.Valid (eq .Play.ResultType.String "unforced_error")}}selected{{end}}>Unforced Error</option>
-            </select>
-        </div>
+                <line x1="5000" y1="0" x2="5000" y2="20000" class="stroke-slate-200 stroke-[100px]" />
 
-        <div class="form-field">
-            <label for="hand_side">Forehand/Backhand</label>
-            <select required id="hand_side" name="hand_side">
-                <option value="forehand" {{if and .Play.HandSide.Valid (eq .Play.HandSide.String "forehand")}}selected{{end}}>Forehand</option>
-                <option value="backhand" {{if and .Play.HandSide.Valid (eq .Play.HandSide.String "backhand")}}selected{{end}}>Backhand</option>
-            </select>
-        </div>
+                <line x1="0" y1="9900" x2="10000" y2="9900" class="stroke-slate-400 stroke-[50px]" />
+                <line x1="0" y1="10100" x2="10000" y2="10100" class="stroke-slate-400 stroke-[50px]" />
 
-        <div class="form-field">
-            <label for="contact_type">Contact Type</label>
-            <select required id="contact_type" name="contact_type">
-                <option value="serve" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "serve")}}selected{{end}}>Serve</option>
-                <option value="groundstroke" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "groundstroke")}}selected{{end}}>Groundstroke</option>
-                <option value="volley" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "volley")}}selected{{end}}>Volley</option>
-                <option value="overhead" {{if and .Play.ContactType.Valid (eq .Play.ContactType.String "overhead")}}selected{{end}}>Overhead</option>
-            </select>
-        </div>
+                <g
+                    :transform="`translate(${ballPositionX}, ${ballPositionY}) scale(4.5)`"
+                    class="cursor-grab active:cursor-grabbing"
+                    @mousedown="startDrag($event)"
+                >
+                    <circle cx="0" cy="0" r="87.2" fill="#cbdd5c" />
+                    <path
+                        d="m78.9 -37.3c6.2 19.4 5.6 41.1-3.2 61.2-19.2 44.2-70.6 64.4-114.8 45.1-20.1-8.8-35.3-24.2-44-42.7 7.4 23.1 24.3 43.1 48.3 53.6 44.2 19.2 95.5-1 114.8-45.1 10.4-24 9.2-50.2-1.1-72.1z"
+                        fill="#c0d258"
+                    />
+                    <g fill="#fff">
+                        <path
+                            d="m35.2 15.3c9.5-21.9 25.6-38.9 44.9-49.9-1.3-2.9-2.7-5.8-4.3-8.6-21.9 12.3-39.1 31.3-49.3 54.7s-12.4 49-6.5 73.4c3.1-0.7 6.2-1.6 9.2-2.7-5.1-21.7-3.5-45 6-66.9z"
+                        />
+                        <path
+                            d="m-35.2 -15.4c-9.5 21.9-25.6 38.9-44.9 49.9 1.3 2.9 2.7 5.8 4.3 8.6 21.9-12.3 39.1-31.3 49.3-54.7s12.4-49 6.5-73.4c-3.1 0.7-6.2 1.6-9.2 2.7 5.1 21.7 3.6 45.1-6 66.9z"
+                        />
+                    </g>
+                    <path
+                        d="m79.7 -34.4c0.1-0.1 0.3-0.1 0.4-0.2-0.4-0.9-0.8-1.9-1.3-2.8 0.3 1 0.6 2 0.9 3z"
+                        fill="#d1d3d4"
+                    />
+                    <path
+                        d="m17.8 73.2c0.5 3.9 1.3 7.8 2.2 11.7 3.1-0.7 6.2-1.6 9.2-2.7-0.9-3.9-1.6-7.9-2.1-12-3 1.1-6.1 2.2-9.3 3z"
+                        fill="#e6e7e8"
+                    />
+                    <path
+                        d="m-73.6 41.9c-1.9-2.6-3.7-5.2-5.4-7.9-0.3 0.2-0.7 0.4-1 0.6v0.1c0.3 0.6 0.6 1.3 0.8 1.9 0 0.1 0.1 0.2 0.1 0.3 0.3 0.5 0.5 1.1 0.8 1.6 0.1 0.2 0.2 0.4 0.3 0.5 0.1 0.3 0.3 0.5 0.4 0.8 0.6 1.2 1.2 2.3 1.8 3.4 0.8-0.5 1.5-0.9 2.2-1.3z"
+                        fill="#e6e7e8"
+                    />
+                </g>
+            </svg>
+        </section>
 
-        <div class="form-field">
-            <label for="shot_effect">Shot Effect</label>
-            <select required id="shot_effect" name="shot_effect">
-                <option value="flat" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "flat")}}selected{{end}}>Flat</option>
-                <option value="up" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "up")}}selected{{end}}>Up</option>
-                <option value="down" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "down")}}selected{{end}}>Down</option>
-                <option value="drop" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "drop")}}selected{{end}}>Drop</option>
-                <option value="smash" {{if and .Play.ShotEffect.Valid (eq .Play.ShotEffect.String "smash")}}selected{{end}}>Smash</option>
-            </select>
-        </div>
+        <section class="flex flex-col gap-4 col-span-3">
+            <div class="form-field">
+                <label>Player</label>
+                <div class="grid grid-cols-2 gap-y-4 gap-x-2">
+                    <label class="button-secondary">
+                        <span>{{ .Match.Team1Player1.Name }}</span>
+                        <input
+                            type="radio"
+                            name="player_id"
+                            id="team-one-player-one"
+                            x-model="playerID"
+                            value="{{ .Match.Team1Player1.ID }}"
+                        />
+                    </label>
+                    <label class="button-secondary">
+                        <span>{{ .Match.Team1Player2.Name }}</span>
+                        <input
+                            type="radio"
+                            name="player_id"
+                            id="team-one-player-two"
+                            x-model="playerID"
+                            value="{{ .Match.Team1Player2.ID }}"
+                        />
+                    </label>
+                    <label class="button-secondary">
+                        <span>{{ .Match.Team2Player1.Name }}</span>
+                        <input
+                            type="radio"
+                            name="player_id"
+                            id="team-two-player-one"
+                            x-model="playerID"
+                            value="{{ .Match.Team2Player1.ID }}"
+                        />
+                    </label>
+                    <label class="button-secondary">
+                        <span>{{ .Match.Team2Player2.Name }}</span>
+                        <input
+                            type="radio"
+                            name="player_id"
+                            id="team-two-player-two"
+                            x-model="playerID"
+                            value="{{ .Match.Team2Player2.ID }}"
+                        />
+                    </label>
+                </div>
+            </div>
+            <div class="form-field">
+                <label for="result_type">Result of Play</label>
+                <div class="grid grid-cols-4 gap-2">
+                    <label class="button-secondary">
+                        <span>Next Point</span>
+                        <input type="radio" name="result_type" id="return" x-model="resultType" value="" />
+                    </label>
+                    <label class="button-secondary">
+                        <span>Winner</span>
+                        <input type="radio" name="result_type" id="win" x-model="resultType" value="no_return_winner" />
+                    </label>
+                    <label class="button-secondary">
+                        <span>Error</span>
+                        <input type="radio" name="result_type" id="error" x-model="resultType" value="error" />
+                    </label>
+                    <label class="button-secondary">
+                        <span>Unforced Error</span>
+                        <input type="radio" name="result_type" id="unforced_error" x-model="resultType" value="unforced_error" />
+                    </label>
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Shot Played</label>
+                <div class="grid grid-cols-6 gap-4">
+                    <div class="col-span-2 flex flex-col gap-4">
+                        <label>Side of Play</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="button-secondary">
+                                <span>Forehand</span>
+                                <input type="radio" name="hand_side" id="forehand" x-model="handSide" value="forehand" />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Backhand</span>
+                                <input type="radio" name="hand_side" id="backhand" x-model="handSide" value="backhand" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-span-4 flex flex-col gap-4">
+                        <label>Contact Type</label>
+                        <div class="grid grid-cols-4 gap-4">
+                            <label class="button-secondary">
+                                <span>Serve</span>
+                                <input type="radio" name="contact_type" id="serve" x-model="contactType" value="serve" />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Groundstroke</span>
+                                <input type="radio" name="contact_type" id="groundstroke" x-model="contactType" value="groundstroke" />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Volley</span>
+                                <input type="radio" name="contact_type" id="volley" x-model="contactType" value="volley" />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Overhead</span>
+                                <input type="radio" name="contact_type" id="overhead" x-model="contactType" value="overhead" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-span-6 flex flex-col gap-4">
+                        <label>Shot effect</label>
+                        <div class="grid grid-cols-5 gap-4">
+                            <label class="button-secondary">
+                                <span>Flat</span>
+                                <input type="radio" name="shot_effect" id="flat" x-model="shotEffect" value="flat"  />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Up</span>
+                                <input type="radio" name="shot_effect" id="up" x-model="shotEffect" value="up" />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Down</span>
+                                <input type="radio" name="shot_effect" id="down" x-model="shotEffect" value="down" />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Smash</span>
+                                <input type="radio" name="shot_effect" id="smash" x-model="shotEffect" value="smash" />
+                            </label>
+                            <label class="button-secondary">
+                                <span>Drop</span>
+                                <input type="radio" name="shot_effect" id="drop" x-model="shotEffect" value="drop" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <button type="submit" class="button-primary cta">Save Play</button>
+        <!-- Hidden inputs to sync Alpine.js state with form data -->
+        <input type="hidden" name="ball_position_x" :value="ballPositionX">
+        <input type="hidden" name="ball_position_y" :value="ballPositionY">
+
+        <div id="saving-indicator" style="display: none;" class="fixed top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-md text-sm">
+            Saving...
+        </div>
     </form>
 
     <div class="p-4 rounded-md border border-error">
@@ -98,3 +226,101 @@
         </button>
     </div>
 </section>
+
+<script>
+    document.addEventListener("alpine:init", () => {
+        Alpine.data("playForm", (initialData) => ({
+            // Form data properties
+            playerID: initialData.playerID || "",
+            ballPositionX: initialData.ballPositionX || 0,
+            ballPositionY: initialData.ballPositionY || 0,
+            resultType: initialData.resultType || "",
+            handSide: initialData.handSide || "",
+            contactType: initialData.contactType || "",
+            shotEffect: initialData.shotEffect || "",
+
+            // Drag state
+            isDragging: false,
+
+            // Coordinate conversion from mouse position to SVG coordinates
+            getSVGCoordinates(event, svg) {
+                const rect = svg.getBoundingClientRect();
+                const point = svg.createSVGPoint();
+                point.x = event.clientX;
+                point.y = event.clientY;
+
+                // Transform screen coordinates to SVG coordinates
+                const svgPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+
+                return {
+                    x: Math.round(svgPoint.x),
+                    y: Math.round(svgPoint.y),
+                };
+            },
+
+            // Ensure coordinates stay within court boundaries
+            constrainToCourt(x, y) {
+                return {
+                    x: Math.max(0, Math.min(10000, x)),
+                    y: Math.max(0, Math.min(20000, y)),
+                };
+            },
+
+            // Drag event handlers
+            startDrag() {
+                this.isDragging = true;
+            },
+
+            drag(event) {
+                if (!this.isDragging) return;
+
+                const svg = event.currentTarget;
+                const coords = this.getSVGCoordinates(event, svg);
+                const bounded = this.constrainToCourt(coords.x, coords.y);
+
+                this.ballPositionX = bounded.x;
+                this.ballPositionY = bounded.y;
+            },
+
+            endDrag() {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.saveBallPosition();
+                }
+            },
+
+            saveBallPosition() {
+                const indicator = document.getElementById('saving-indicator');
+                if (indicator) indicator.style.display = 'block';
+
+                const params = new URLSearchParams();
+                params.append('ball_position_x', this.ballPositionX.toString());
+                params.append('ball_position_y', this.ballPositionY.toString());
+                
+                if (this.playerID) params.append('player_id', this.playerID);
+                if (this.resultType) params.append('result_type', this.resultType);
+                if (this.handSide) params.append('hand_side', this.handSide);
+                if (this.contactType) params.append('contact_type', this.contactType);
+                if (this.shotEffect) params.append('shot_effect', this.shotEffect);
+
+                fetch(window.location.pathname, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params
+                })
+                .then(response => {
+                    if (indicator) indicator.style.display = 'none';
+                    if (!response.ok) {
+                        console.error('Save failed:', response.status);
+                    }
+                })
+                .catch(error => {
+                    if (indicator) indicator.style.display = 'none';
+                    console.error('Save error:', error);
+                });
+            },
+        }));
+    });
+</script>

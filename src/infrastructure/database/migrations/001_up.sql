@@ -53,8 +53,8 @@ CREATE TABLE plays (
     point_id INTEGER REFERENCES points(id) ON DELETE CASCADE,
     play_number INTEGER NOT NULL,
     player_id INTEGER REFERENCES players(id),
-    ball_position_x INTEGER NOT NULL CHECK (ball_position_x >= 0 AND ball_position_x <= 6),
-    ball_position_y INTEGER NOT NULL CHECK (ball_position_y >= 0 AND ball_position_y <= 11),
+    ball_position_x INTEGER NOT NULL CHECK (ball_position_x >= 0 AND ball_position_x <= 10000),
+    ball_position_y INTEGER NOT NULL CHECK (ball_position_y >= 0 AND ball_position_y <= 20000),
     result_type VARCHAR(50) CHECK (result_type IN ('unforced_error', 'error', 'no_return_winner')),
     hand_side VARCHAR(50) CHECK (hand_side IN ('forehand', 'backhand')),
     contact_type VARCHAR(50) CHECK (contact_type IN ('serve', 'groundstroke', 'volley', 'overhead')),
@@ -69,8 +69,8 @@ CREATE TABLE player_positions (
     id SERIAL PRIMARY KEY,
     play_id INTEGER REFERENCES plays(id) ON DELETE CASCADE,
     player_id INTEGER REFERENCES players(id),
-    position_x INTEGER NOT NULL CHECK (position_x >= 0 AND position_x <= 6),
-    position_y INTEGER NOT NULL CHECK (position_y >= 0 AND position_y <= 11),
+    position_x INTEGER NOT NULL CHECK (position_x >= 0 AND position_x <= 10000),
+    position_y INTEGER NOT NULL CHECK (position_y >= 0 AND position_y <= 20000),
     UNIQUE(play_id, player_id)
 );
 

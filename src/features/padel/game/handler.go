@@ -1,10 +1,10 @@
 package game
 
 import (
+	"ct-padel-s/src/features/padel/game/gamemodel"
 	"ct-padel-s/src/features/padel/game/gamerepo"
 	"ct-padel-s/src/features/padel/game/gameshared"
 	"ct-padel-s/src/features/padel/game/gameviews"
-	"ct-padel-s/src/features/padel/game/gamemodel"
 	"ct-padel-s/src/features/padel/match/matchrepo"
 	"ct-padel-s/src/features/padel/match/matchshared"
 	"ct-padel-s/src/features/padel/point/pointrepo"

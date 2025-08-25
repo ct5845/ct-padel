@@ -50,7 +50,7 @@ func App() {
 
 	mux.HandleFunc("POST /matches/{matchID}/sets/{setID}/games/{gameID}/points/{pointID}/plays", play.Create)
 	mux.HandleFunc("GET /matches/{matchID}/sets/{setID}/games/{gameID}/points/{pointID}/plays/{playID}", play.Get)
-	mux.HandleFunc("PATCH /matches/{matchID}/sets/{setID}/games/{gameID}/points/{pointID}/plays/{playID}", play.Update)
+	mux.HandleFunc("PATCH /matches/{matchID}/sets/{setID}/games/{gameID}/points/{pointID}/plays/{playID}", play.Patch)
 	mux.HandleFunc("DELETE /matches/{matchID}/sets/{setID}/games/{gameID}/points/{pointID}/plays/{playID}", play.Delete)
 
 	// Home page
